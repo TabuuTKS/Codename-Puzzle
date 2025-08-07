@@ -1,4 +1,6 @@
 using UnityEngine;
+using System.Collections;
+
 
 public class PlayerController : MonoBehaviour
 {
@@ -13,6 +15,10 @@ public class PlayerController : MonoBehaviour
     //Interaction
     private IInteractable CurrentInteractable = null;
 
+    //Player Run
+    [HideInInspector] public bool canRun = true;
+    private Coroutine RunCoroutine;
+
     private void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
@@ -21,6 +27,7 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         PlayerInput();
+        PlayerRun();
     }
 
     private void PlayerInput()
@@ -29,6 +36,29 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.E) && CurrentInteractable != null)
         {
             CurrentInteractable.Action();
+        }
+    }
+
+    private void PlayerRun()
+    {
+        if (Input.GetKeyDown(KeyCode.LeftShift) && canRun)
+        {
+            MoveSpeed *= 2;
+            if (RunCoroutine != null)
+            {
+                StopCoroutine(RunCoroutine);
+                RunCoroutine = null;
+            }
+            
+        }
+        else if (Input.GetKey(KeyCode.LeftShift) && canRun && direction != Vector2.zero)
+        {
+            GameUI.instance.StaminaBar();
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        {
+            MoveSpeed /= 2;
+            RunCoroutine = StartCoroutine(GameUI.instance.ResetStamina());
         }
     }
     private void FixedUpdate()
