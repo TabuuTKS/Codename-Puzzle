@@ -1,13 +1,14 @@
 using UnityEngine;
 using System.Collections;
 
-
 public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField] [Range(0, 10)] float MoveSpeed = 2f;
+    [SerializeField] [Range(0, 10)] float RunSpeed = 4f;
 
     //Movement private
+    private float speed;
     private Vector2 direction = Vector2.zero;
     private new Rigidbody2D rigidbody;
     private const float SpeedMultiplyer = 100f;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour
     private void Start()
     {
         rigidbody = GetComponent<Rigidbody2D>();
+        speed = MoveSpeed;
     }
 
     private void Update()
@@ -43,27 +45,29 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.LeftShift) && canRun)
         {
-            MoveSpeed *= 2;
+            speed = RunSpeed;
             if (RunCoroutine != null)
             {
                 StopCoroutine(RunCoroutine);
                 RunCoroutine = null;
             }
-            
         }
-        else if (Input.GetKey(KeyCode.LeftShift) && canRun && direction != Vector2.zero)
+        if(Input.GetKey(KeyCode.LeftShift) && canRun && direction != Vector2.zero)
         {
             GameUI.instance.StaminaBar();
         }
-        else if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyUp(KeyCode.LeftShift)) {
+            speed = MoveSpeed;
+            RunCoroutine = StartCoroutine(GameUI.instance.ResetStamina()); 
+        }
+        if (PlayerPrefs.Stamina <= 0)
         {
-            MoveSpeed /= 2;
-            RunCoroutine = StartCoroutine(GameUI.instance.ResetStamina());
+            speed = MoveSpeed;
         }
     }
     private void FixedUpdate()
     {
-        rigidbody.linearVelocity = direction.normalized * MoveSpeed * SpeedMultiplyer * Time.fixedDeltaTime;
+        rigidbody.linearVelocity = direction.normalized * speed * SpeedMultiplyer * Time.fixedDeltaTime;
     }
 
     private void OnTriggerStay2D(Collider2D collision)

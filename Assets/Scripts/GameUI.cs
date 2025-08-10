@@ -12,8 +12,8 @@ public class GameUI : MonoBehaviour
     [SerializeField] Color StaminaColorLow;
 
     //private
-    private const float RunDuration = 10f;
-    private const float RunResetDelay = 20f;
+    private const float RunDuration = 5f;
+    private const float RunResetDelay = 700f;
     private float RunTimerElapsed = 0f;
 
     #region Singleton
