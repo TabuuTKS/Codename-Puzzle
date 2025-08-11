@@ -4,7 +4,7 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] PlayerController player;
+    [SerializeField] PlayerStateMashine player;
     [Header("Stamina Bar")]
     [SerializeField] Slider StaminaSlider;
     [SerializeField] Image StaminaSliderFill;
@@ -51,7 +51,7 @@ public class GameUI : MonoBehaviour
         PlayerPrefs.Stamina -= (Time.deltaTime/10);
         if (RunTimerElapsed == 0f)
         {
-            player.canRun = false;
+            player.SwitchState(player.moveState);
         }
     }
 
@@ -67,6 +67,5 @@ public class GameUI : MonoBehaviour
 
         }
         PlayerPrefs.Stamina = 1f;
-        player.canRun = true;
     }
 }
