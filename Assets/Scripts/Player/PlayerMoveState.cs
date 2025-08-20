@@ -7,6 +7,11 @@ public class PlayerMoveState : PlayerBaseState
 
     }
 
+    public override void FixedUpdateState(PlayerStateMashine player)
+    {
+        player.rigidbody2D.linearVelocity = player.direction.normalized * player.speed * 100f * Time.fixedDeltaTime;
+    }
+
     public override void UpdateState(PlayerStateMashine player)
     {
         player.speed = player.MoveSpeed;
