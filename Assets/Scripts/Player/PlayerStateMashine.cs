@@ -1,14 +1,15 @@
 using UnityEngine;
-
 public class PlayerStateMashine : MonoBehaviour
 {
     [Header("Movement")]
+    [Range(0, 10)] public float WalkSpeed = 2f;
     [Range(0, 10)] public float MoveSpeed = 2f;
     [Range(0, 10)] public float RunSpeed = 4f;
 
     [Header("Input Keys")]
     [SerializeField] KeyCode RunButton;
     [SerializeField] KeyCode PounceButton;
+    [SerializeField] KeyCode WalkButton;
 
     [Header("Animation")]
     public Animator animator;
@@ -25,6 +26,7 @@ public class PlayerStateMashine : MonoBehaviour
     public PlayerMoveState moveState = new PlayerMoveState(); 
     public PlayerRunState runState = new PlayerRunState();
     public PlayerPounceState pounceState = new PlayerPounceState();
+    public PlayerWalkState walkState = new PlayerWalkState();
 
     //Movement Values
     [HideInInspector] public Vector2 direction;
@@ -35,8 +37,7 @@ public class PlayerStateMashine : MonoBehaviour
     private Vector3 Horizontal = new Vector3(0, 0, 90);
 
     //Attacks
-    [HideInInspector] public float jumpPressedTime = -1f;
-    [HideInInspector] public float jumpBuffer = 0.2f;
+    [HideInInspector] public bool hadPounce;
 
     [HideInInspector] public new Rigidbody2D rigidbody2D;
     private Coroutine RunCoroutine;
@@ -63,6 +64,12 @@ public class PlayerStateMashine : MonoBehaviour
     private void FixedUpdate()
     {
         currentState.FixedUpdateState(this);
+
+        if (hadPounce)
+        {
+            SwitchState(pounceState);
+            hadPounce = false;
+        }
     }
 
     public void SwitchState(PlayerBaseState state)
@@ -76,7 +83,8 @@ public class PlayerStateMashine : MonoBehaviour
         if (Input.GetAxisRaw("Horizontal") != 0 || Input.GetAxisRaw("Vertical") != 0)
         {
             if (Input.GetKey(RunButton) && PlayerPrefs.Stamina > 0) { SwitchState(runState); }
-            else { SwitchState(moveState); }
+            else if (Input.GetKey(WalkButton)) { SwitchState(walkState); }
+            else { SwitchState(moveState); PlayerPrefs.isHidden = false; }
         }
         else { SwitchState(idleState); }
 
@@ -85,7 +93,12 @@ public class PlayerStateMashine : MonoBehaviour
         else if (Input.GetKeyUp(RunButton)) { StartRunCoroutine(); }
 
         //Attacks
-        if (Input.GetKeyDown(PounceButton)) { jumpPressedTime = Time.time; SwitchState(pounceState); }
+        if (Input.GetKeyDown(PounceButton))
+        {
+            Debug.Log("Pounce State");
+            hadPounce = true;
+            SwitchState(pounceState);
+        }
     }
 
 

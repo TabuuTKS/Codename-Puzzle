@@ -4,7 +4,6 @@ public class PlayerMoveState : PlayerBaseState
 {
     public override void EnterState(PlayerStateMashine player)
     {
-
     }
 
     public override void FixedUpdateState(PlayerStateMashine player)
